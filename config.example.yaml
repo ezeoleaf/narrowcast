@@ -1,0 +1,52 @@
+# Copy to config.yaml and edit for your interests.
+
+topics:
+  - technology
+  - science
+
+keywords:
+  - raspberry pi
+  - open source
+  - climate
+
+exclude:
+  - crypto
+  - sports
+
+match_mode: any       # any | all
+match_style: word     # substring | word (word avoids "go" in "cargo")
+
+max_age: 48h
+max_per_cycle: 5
+pause_between: 2s
+
+# Plain URLs or labeled entries. Optional OPML merges more feeds.
+feeds:
+  - url: https://hnrss.org/frontpage
+    label: Hacker News
+  - https://www.reddit.com/r/golang/.rss
+
+# opml: subscriptions.opml
+
+schedule:
+  interval: 30m
+
+state:
+  file: .narrowcast/seen.json
+  persist: false
+  ttl: 168h
+  max_entries: 2000
+
+audio:
+  engine: auto        # mock | espeak | piper | auto
+  fallback: [piper, espeak, mock]
+  max_summary_chars: 400
+  max_utterance_chars: 2500
+  espeak:
+    binary: espeak-ng
+    voice: en
+    speed: 160
+  piper:
+    binary: piper
+    model: /usr/share/piper/en_US-lessac-medium.onnx
+    play_binary: aplay

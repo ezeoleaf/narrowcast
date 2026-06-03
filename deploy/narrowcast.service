@@ -1,0 +1,23 @@
+[Unit]
+Description=Narrowcast Personal News Radio
+Documentation=https://github.com/ezeoleaf/narrowcast
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/narrowcast
+ExecStart=/usr/local/bin/narrowcast -daemon -config /home/pi/narrowcast/config.yaml
+Restart=on-failure
+RestartSec=30
+# Give TTS time to finish on stop
+TimeoutStopSec=30
+
+# Hardening (adjust if TTS needs broader filesystem access)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

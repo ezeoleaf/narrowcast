@@ -3,6 +3,7 @@ package audio
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -37,7 +38,11 @@ func (p *PiperSpeaker) Speak(ctx context.Context, title, summary string) error {
 	}
 	wavPath := wav.Name()
 	_ = wav.Close()
-	defer os.Remove(wavPath)
+	defer func() {
+		if err := os.Remove(wavPath); err != nil {
+			log.Printf("error removing wav file: %v", err)
+		}
+	}()
 
 	synth := exec.CommandContext(ctx, p.binary(), "--model", p.Model, "--output_file", wavPath)
 	synth.Stdin = strings.NewReader(text)

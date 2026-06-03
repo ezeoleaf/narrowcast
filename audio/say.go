@@ -3,6 +3,7 @@ package audio
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -55,7 +56,11 @@ func (s *SaySpeaker) Speak(ctx context.Context, title, summary string) error {
 		_ = os.Remove(path)
 		return err
 	}
-	defer os.Remove(path)
+	defer func() {
+		if err := os.Remove(path); err != nil {
+			log.Printf("error removing temp file: %v", err)
+		}
+	}()
 
 	args := []string{"-f", path}
 	if s.Voice != "" {

@@ -22,7 +22,7 @@ var version = "0.3.0"
 func main() {
 	configPath := flag.String("config", "config.yaml", "path to YAML or JSON config file")
 	fetchTimeout := flag.Duration("fetch-timeout", 30*time.Second, "max time to wait for all feeds")
-	tts := flag.String("tts", "", "override audio engine: mock, espeak, piper, auto")
+	tts := flag.String("tts", "", "override audio engine: mock, say, espeak, piper, auto")
 	daemon := flag.Bool("daemon", false, "run forever on schedule.interval")
 	once := flag.Bool("once", false, "single cycle; ignore schedule")
 	stateFile := flag.String("state-file", "", "seen-URL JSON path (empty disables)")

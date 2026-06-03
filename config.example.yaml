@@ -38,10 +38,15 @@ state:
   max_entries: 2000
 
 audio:
-  engine: auto        # mock | espeak | piper | auto
-  fallback: [piper, espeak, mock]
+  # macOS: use `say` (built-in) — no Homebrew TTS deps required.
+  # Linux/Pi: piper or espeak-ng, then mock.
+  engine: auto
+  fallback: [say, piper, espeak, mock]   # say is skipped off macOS
   max_summary_chars: 400
   max_utterance_chars: 2500
+  say:
+    voice: Samantha   # optional — list with: say -v ?
+    rate: 180         # words per minute
   espeak:
     binary: espeak-ng
     voice: en

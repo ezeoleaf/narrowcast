@@ -42,12 +42,20 @@ type ScheduleConfig struct {
 
 // AudioConfig selects the TTS engine and its options.
 type AudioConfig struct {
-	Engine            string   `yaml:"engine" json:"engine"` // mock, espeak, piper, auto
-	Fallback          []string `yaml:"fallback" json:"fallback"`
-	MaxSummaryChars   int      `yaml:"max_summary_chars" json:"max_summary_chars"`
-	MaxUtteranceChars int      `yaml:"max_utterance_chars" json:"max_utterance_chars"`
+	Engine            string       `yaml:"engine" json:"engine"` // mock, say, espeak, piper, auto
+	Fallback          []string     `yaml:"fallback" json:"fallback"`
+	MaxSummaryChars   int          `yaml:"max_summary_chars" json:"max_summary_chars"`
+	MaxUtteranceChars int          `yaml:"max_utterance_chars" json:"max_utterance_chars"`
+	Say               SayConfig    `yaml:"say" json:"say"`
 	Espeak            EspeakConfig `yaml:"espeak" json:"espeak"`
 	Piper             PiperConfig  `yaml:"piper" json:"piper"`
+}
+
+// SayConfig configures macOS built-in speech (`say`).
+type SayConfig struct {
+	Binary string `yaml:"binary" json:"binary"`
+	Voice  string `yaml:"voice" json:"voice"` // Samantha, Alex, … — `say -v ?`
+	Rate   int    `yaml:"rate" json:"rate"`   // words per minute
 }
 
 // EspeakConfig configures espeak-ng / espeak.
@@ -120,7 +128,7 @@ func (c *Config) applyDefaults() {
 		c.Audio.Engine = "mock"
 	}
 	if len(c.Audio.Fallback) == 0 {
-		c.Audio.Fallback = []string{"piper", "espeak", "mock"}
+		c.Audio.Fallback = defaultAudioFallback()
 	}
 	if c.Audio.MaxSummaryChars <= 0 {
 		c.Audio.MaxSummaryChars = 400
@@ -176,9 +184,9 @@ func (c *Config) validate() error {
 	c.MatchStyle = style
 	engine := strings.ToLower(strings.TrimSpace(c.Audio.Engine))
 	switch engine {
-	case "mock", "espeak", "piper", "auto":
+	case "mock", "say", "espeak", "piper", "auto":
 	default:
-		return fmt.Errorf("config: audio.engine must be mock, espeak, piper, or auto, got %q", c.Audio.Engine)
+		return fmt.Errorf("config: audio.engine must be mock, say, espeak, piper, or auto, got %q", c.Audio.Engine)
 	}
 	c.Audio.Engine = engine
 	if len(c.Feeds) == 0 && strings.TrimSpace(c.OPML) == "" {

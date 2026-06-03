@@ -13,9 +13,14 @@ import (
 func NewSpeaker(cfg config.AudioConfig) (Speaker, string, error) {
 	engine := strings.ToLower(strings.TrimSpace(cfg.Engine))
 	if engine == "auto" {
-		return newFallbackChain(cfg, cfg.Fallback)
+		names := cfg.Fallback
+		if len(names) == 0 {
+			names = DefaultFallback()
+		}
+		return newFallbackChain(cfg, names)
 	}
-	if len(cfg.Fallback) > 0 && engine != "mock" {
+	// Allow piper/espeak to fall back; say and mock are single-shot engines.
+	if len(cfg.Fallback) > 0 && (engine == "piper" || engine == "espeak") {
 		seen := map[string]bool{engine: true}
 		ordered := []string{engine}
 		for _, n := range cfg.Fallback {
@@ -54,7 +59,7 @@ func newFallbackChain(cfg config.AudioConfig, names []string) (Speaker, string, 
 		used = append(used, name)
 	}
 	if len(chain) == 0 {
-		return NewMockSpeaker(), "mock (fallback empty)", nil
+		return NewMockSpeaker(), "mock (no TTS engines available)", nil
 	}
 	if len(chain) == 1 {
 		return chain[0], used[0], nil
@@ -68,6 +73,17 @@ func buildSpeaker(cfg config.AudioConfig, engine string) (Speaker, error) {
 	switch engine {
 	case "mock":
 		return NewMockSpeaker(), nil
+	case "say":
+		if !AvailableOnDarwin() {
+			return nil, errSkipEngine
+		}
+		return &SaySpeaker{
+			Binary:            cfg.Say.Binary,
+			Voice:             cfg.Say.Voice,
+			Rate:              cfg.Say.Rate,
+			MaxSummaryRunes:   cfg.MaxSummaryChars,
+			MaxUtteranceRunes: cfg.MaxUtteranceChars,
+		}, nil
 	case "espeak":
 		return &EspeakSpeaker{
 			Binary:            cfg.Espeak.Binary,

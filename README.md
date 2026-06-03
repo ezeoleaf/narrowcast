@@ -1,6 +1,6 @@
 # narrowcast
 
-A lightweight **Personal News Radio** — fetch RSS feeds, filter by your interests, and read headlines aloud (TTS). Built for Raspberry Pi: plain Go, no heavy frameworks.
+A lightweight **Personal News Radio** — fetch RSS feeds, filter by your interests, and read headlines aloud (TTS). Runs on **macOS** (built-in `say`) and **Raspberry Pi** (Piper / espeak-ng).
 
 ## Quick start
 
@@ -36,7 +36,7 @@ Release binaries are published when you push a version tag (`v0.3.0`, etc.); see
 | `-config` | Config path (default `config.yaml`) |
 | `-once` / `-daemon` | Run mode |
 | `-dry-run` | Log matches, no TTS |
-| `-tts` | Override: `mock`, `espeak`, `piper`, `auto` |
+| `-tts` | Override: `mock`, `say`, `espeak`, `piper`, `auto` |
 | `-state-file` | Seen URLs (`none` disables) |
 | `-version` | Print version |
 
@@ -48,9 +48,30 @@ Release binaries are published when you push a version tag (`v0.3.0`, etc.); see
 | `feeds` | URL strings or `{url, label}` |
 | `opml` | Merge feeds from OPML file |
 | `audio.engine` | `auto` tries `fallback` chain |
-| `audio.fallback` | e.g. `[piper, espeak, mock]` |
+| `audio.fallback` | Platform default if empty; e.g. `[say, piper, espeak, mock]` |
+| `audio.say` | macOS voice (`Samantha`) and speech rate |
 
 Terms can use regex literals: `/\braspberry\s+pi/i`
+
+## macOS
+
+No extra TTS install needed — macOS includes `say`:
+
+```bash
+# List voices
+say -v ?
+
+# config.yaml
+audio:
+  engine: say          # or auto with fallback: [say, mock]
+  say:
+    voice: Samantha
+    rate: 180
+
+go run . -once -tts say
+```
+
+With `engine: auto`, the default fallback chain on macOS is `say → piper → espeak → mock` (missing binaries are skipped).
 
 ## Raspberry Pi install
 

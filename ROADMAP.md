@@ -8,6 +8,7 @@ Personal News Radio — lightweight Go backend for RSS → filter → TTS (Raspb
 - [x] YAML/JSON config (topics, keywords, feeds)
 - [x] Concurrent RSS fetch (`gofeed`)
 - [x] Mock / espeak / Piper TTS backends
+- [x] **macOS `say` TTS** (built-in, no Homebrew deps)
 - [x] Daemon mode with `schedule.interval`
 - [x] Seen-URL state file (skip repeats)
 - [x] URL deduplication (newest wins)

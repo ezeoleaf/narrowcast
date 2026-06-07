@@ -55,3 +55,13 @@ audio:
     binary: piper
     model: /usr/share/piper/en_US-lessac-medium.onnx
     play_binary: aplay
+  elevenlabs:
+    # api_key: ""                    # prefer env var (do not commit secrets)
+    api_key_env: ELEVENLABS_API_KEY
+    voice_id: ""                     # from ElevenLabs voice library
+    model_id: eleven_turbo_v2_5
+    play_binary: afplay             # macOS; use mpv or mpg123 on Linux
+    timeout: 60s
+  kokoro:
+    script: /home/pi/bin/kokoro-speak.sh
+    args: []                         # extra args passed before stdin is attached

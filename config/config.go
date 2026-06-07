@@ -46,9 +46,11 @@ type AudioConfig struct {
 	Fallback          []string     `yaml:"fallback" json:"fallback"`
 	MaxSummaryChars   int          `yaml:"max_summary_chars" json:"max_summary_chars"`
 	MaxUtteranceChars int          `yaml:"max_utterance_chars" json:"max_utterance_chars"`
-	Say               SayConfig    `yaml:"say" json:"say"`
-	Espeak            EspeakConfig `yaml:"espeak" json:"espeak"`
-	Piper             PiperConfig  `yaml:"piper" json:"piper"`
+	Say               SayConfig        `yaml:"say" json:"say"`
+	Espeak            EspeakConfig     `yaml:"espeak" json:"espeak"`
+	Piper             PiperConfig      `yaml:"piper" json:"piper"`
+	ElevenLabs        ElevenLabsConfig `yaml:"elevenlabs" json:"elevenlabs"`
+	Kokoro            KokoroConfig     `yaml:"kokoro" json:"kokoro"`
 }
 
 // SayConfig configures macOS built-in speech (`say`).
@@ -184,11 +186,14 @@ func (c *Config) validate() error {
 	c.MatchStyle = style
 	engine := strings.ToLower(strings.TrimSpace(c.Audio.Engine))
 	switch engine {
-	case "mock", "say", "espeak", "piper", "auto":
+	case "mock", "say", "espeak", "piper", "elevenlabs", "kokoro", "auto":
 	default:
-		return fmt.Errorf("config: audio.engine must be mock, say, espeak, piper, or auto, got %q", c.Audio.Engine)
+		return fmt.Errorf("config: audio.engine must be mock, say, espeak, piper, elevenlabs, kokoro, or auto, got %q", c.Audio.Engine)
 	}
 	c.Audio.Engine = engine
+	if err := c.validateAudioEngine(); err != nil {
+		return err
+	}
 	if len(c.Feeds) == 0 && strings.TrimSpace(c.OPML) == "" {
 		return fmt.Errorf("config: at least one feed URL or opml file is required")
 	}

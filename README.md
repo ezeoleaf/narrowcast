@@ -36,7 +36,7 @@ Release binaries are published when you push a version tag (`v0.3.0`, etc.); see
 | `-config` | Config path (default `config.yaml`) |
 | `-once` / `-daemon` | Run mode |
 | `-dry-run` | Log matches, no TTS |
-| `-tts` | Override: `mock`, `say`, `espeak`, `piper`, `auto` |
+| `-tts` | Override: `mock`, `say`, `espeak`, `piper`, `elevenlabs`, `kokoro`, `auto` |
 | `-state-file` | Seen URLs (`none` disables) |
 | `-version` | Print version |
 
@@ -50,8 +50,36 @@ Release binaries are published when you push a version tag (`v0.3.0`, etc.); see
 | `audio.engine` | `auto` tries `fallback` chain |
 | `audio.fallback` | Platform default if empty; e.g. `[say, piper, espeak, mock]` |
 | `audio.say` | macOS voice (`Samantha`) and speech rate |
+| `audio.elevenlabs` | Cloud TTS (`voice_id`, `ELEVENLABS_API_KEY` env) |
+| `audio.kokoro` | Local script path (stdin = text; for Pi) |
 
 Terms can use regex literals: `/\braspberry\s+pi/i`
+
+## ElevenLabs (cloud)
+
+```bash
+export ELEVENLABS_API_KEY=your_key
+```
+
+```yaml
+audio:
+  engine: elevenlabs
+  elevenlabs:
+    voice_id: YOUR_VOICE_ID
+    model_id: eleven_turbo_v2_5
+    play_binary: afplay   # mpv on Linux
+```
+
+## Kokoro (local script on Pi)
+
+Point `audio.kokoro.script` at a shell script that reads text from **stdin** and plays audio. See `deploy/kokoro-speak.sh.example`.
+
+```yaml
+audio:
+  engine: kokoro
+  kokoro:
+    script: /home/pi/bin/kokoro-speak.sh
+```
 
 ## macOS
 
@@ -71,7 +99,7 @@ audio:
 go run . -once -tts say
 ```
 
-With `engine: auto`, the default fallback chain on macOS is `say → piper → espeak → mock` (missing binaries are skipped).
+With `engine: auto`, defaults are `say → elevenlabs → …` on macOS and `kokoro → piper → espeak → mock` on Linux (unconfigured engines are skipped).
 
 ## Raspberry Pi install
 

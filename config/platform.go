@@ -5,9 +5,9 @@ import "runtime"
 func defaultAudioFallback() []string {
 	switch runtime.GOOS {
 	case "darwin":
-		return []string{"say", "piper", "espeak", "mock"}
+		return []string{"say", "elevenlabs", "piper", "espeak", "mock"}
 	case "linux":
-		return []string{"piper", "espeak", "mock"}
+		return []string{"kokoro", "piper", "espeak", "mock"}
 	default:
 		return []string{"mock"}
 	}

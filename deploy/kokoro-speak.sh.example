@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Example Kokoro speak script for narrowcast (audio.kokoro.script).
+# Copy to your Pi, chmod +x, and point config at it.
+#
+# Contract: read utterance from stdin; synthesize and play; exit 0 on success.
+#
+# Replace the body below with your Kokoro invocation, e.g.:
+#   kokoro-tts --voice af_sky --output /tmp/out.wav
+#   aplay /tmp/out.wav
+
+set -euo pipefail
+
+TEXT="$(cat)"
+OUT="$(mktemp /tmp/narrowcast-kokoro-XXXXXX.wav)"
+trap 'rm -f "$OUT"' EXIT
+
+# TODO: wire your local Kokoro CLI here, e.g.:
+# echo "$TEXT" | kokoro-cli --output "$OUT"
+# aplay -q "$OUT"
+
+echo "kokoro-speak.sh: configure this script for your Kokoro install" >&2
+echo "Received ${#TEXT} characters of text" >&2
+exit 1

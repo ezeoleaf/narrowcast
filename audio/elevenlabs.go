@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -74,7 +75,11 @@ func (e *ElevenLabsEngine) Speak(ctx context.Context, title, summary string) err
 		_ = os.Remove(path)
 		return err
 	}
-	defer os.Remove(path)
+	defer func() {
+		if err := os.Remove(path); err != nil {
+			log.Printf("error removing temp file: %v", err)
+		}
+	}()
 
 	return playMedia(ctx, e.PlayBinary, path)
 }
@@ -117,7 +122,11 @@ func (e *ElevenLabsEngine) synthesize(ctx context.Context, text string) ([]byte,
 	if err != nil {
 		return nil, fmt.Errorf("elevenlabs: request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("error closing response body: %v", err)
+		}
+	}()
 
 	data, err := io.ReadAll(io.LimitReader(resp.Body, 32<<20))
 	if err != nil {
